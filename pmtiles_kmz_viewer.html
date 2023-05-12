@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <title>PMTiles Leaflet Example</title>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        <style>
+            body, #map {
+                height: 100vh;
+                margin: 0;
+            }
+            #opacity-slider {
+                width: 200px;
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script src="https://unpkg.com/leaflet@1.9.0/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/pmtiles@2.7.2/dist/index.js"></script>
+			<!-- Leaflet-KMZ -->
+	<script src="https://unpkg.com/leaflet-kmz@1.0.9/dist/leaflet-kmz-src.js"></script>
+        <script type="text/javascript">
+            const map = L.map('map').setView([-7.693153, 110.103633], 13);
+
+            // Add Google Satellite as the basemap
+            const basemap = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: 'Basemap Imagery data &copy; <a href="https://www.google.com/maps">Google</a>'
+            }).addTo(map);
+
+            const p = new pmtiles.PMTiles("Semarang_1965_v2.pmtiles");
+            let overlayLayer;
+
+            p.getHeader().then(h => {
+                overlayLayer = pmtiles.leafletRasterLayer(p, {
+					maxzoom: h.maxZoom,
+                    attribution: 'Satellite Photo tiles created using <a href="https://protomaps.com/docs/pmtiles">PMTiles</a>, Data by <a href="https://earthexplorer.usgs.gov">USGS</a>',
+                    opacity: 1
+                });
+                overlayLayer.addTo(map);
+				
+				// Instantiate KMZ layer (async)
+		var kmz = L.kmzLayer().addTo(map);
+
+		kmz.on('load', function(e) {
+			layerControl.addOverlay(e.layer, e.name);
+			// e.layer.addTo(map);
+		});
+
+		// Add remote KMZ files as layers (NB if they are 3rd-party servers, they MUST have CORS enabled)
+		kmz.load('vorstenlanden2.kmz');
+
+
+
+                // Create basemaps object for layer switcher control
+                const baseMaps = {
+                    "Google Satellite": basemap
+                };
+
+                // Create overlay maps object for layer switcher control
+                const overlayMaps = {
+                    "Satellite Photo Purworejo and Vicinity 1965": overlayLayer, 
+					
+                };
+
+              
+                // Add layer control with 'collapsed: false' option
+                const layerControl = L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+
+
+                // Add opacity slider
+                const opacitySlider = document.createElement('input');
+                opacitySlider.id = 'opacity-slider';
+                opacitySlider.type = 'range';
+                opacitySlider.min = 0;
+                opacitySlider.max = 1;
+                opacitySlider.step = 0.1;
+                opacitySlider.value = 1;
+                opacitySlider.addEventListener('input', function (e) {
+                    overlayLayer.setOpacity(e.target.value);
+                });
+
+                // Add opacity slider below overlay layer checkbox
+                const layerControlContainer = document.querySelector('.leaflet-control-layers');
+                layerControlContainer.appendChild(opacitySlider);
+            });
+        </script>
+    </body>
+</html>
