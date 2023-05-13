@@ -1,6 +1,6 @@
 # PMTiles Viewer
 
-This repo is an example of implementation PMTiles serverless raster tile serving technology developed by [Protomaps]https://github.com/protomaps/PMTiles.
+This repo is an example of implementation PMTiles serverless raster tile serving technology developed by [Protomaps](https://github.com/protomaps/PMTiles).
 
 
 [single_layer_viewer.html](https://github.com/geo2004/Pmtiles_viewer/blob/main/single_layer_viewer.html)  is a simple implementation of single layer PMTiles using Leaflet JS. 
